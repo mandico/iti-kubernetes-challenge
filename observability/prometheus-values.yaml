@@ -1,0 +1,10 @@
+server:
+  global:
+    scrape_interval: 15s
+
+  extraScrapeConfigs:
+    - job_name: "kotlin-app"
+      metrics_path: "/actuator/prometheus"
+      static_configs:
+        - targets:
+            - "kotlin-app.default.svc.cluster.local:8080"
