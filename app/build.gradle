@@ -1,6 +1,6 @@
 buildscript {
-    ext.kotlin_version = '1.2.61'
-    ext.ktor_version = '0.9.4'
+    ext.kotlin_version = '1.9.10' // Última versão estável do Kotlin
+    ext.ktor_version = '2.3.4'   // Última versão estável do Ktor
 
     repositories {
         mavenCentral()
@@ -10,35 +10,42 @@ buildscript {
     }
 }
 
-apply plugin: 'java'
-apply plugin: 'kotlin'
 apply plugin: 'application'
-
-sourceCompatibility = 1.8
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
-compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-}
+apply plugin: 'kotlin'
 
 repositories {
-    jcenter()
-    maven { url "https://dl.bintray.com/kotlin/ktor" }
+    mavenCentral()
 }
 
 mainClassName = 'com.example.hello.MainKt'
 
-jar {
-    manifest {
-        attributes 'Main-Class': mainClassName
-        
-    }
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "io.ktor:ktor-server-netty:$ktor_version"
+    implementation "io.ktor:ktor-server-core:$ktor_version"
+    implementation "io.ktor:ktor-server-host-common:$ktor_version"
+    implementation "io.ktor:ktor-server-html-builder:$ktor_version"
+    implementation "io.ktor:ktor-server-call-logging:$ktor_version"
+    implementation "io.ktor:ktor-server-content-negotiation:$ktor_version"
+    implementation "io.ktor:ktor-serialization-kotlinx-json:$ktor_version"
+    implementation "io.ktor:ktor-server-resources:$ktor_version" // Dependência opcional
+    testImplementation "io.ktor:ktor-server-tests:$ktor_version"
+    testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
+    implementation "io.micrometer:micrometer-registry-prometheus:1.11.3"
+    implementation "io.ktor:ktor-server-metrics-micrometer:$ktor_version"
+
 }
 
-dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile "io.ktor:ktor-server-netty:$ktor_version"
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = "17" // Certifique-se de que sua versão do Java suporta isso
+    }
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Evita conflitos no JAR
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 }
