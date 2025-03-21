@@ -9,22 +9,18 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 
 fun main() {
-    // Cria o registry do Prometheus
     val prometheusRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
     embeddedServer(Netty, port = 8080) {
-        // Instala o Micrometer Metrics no Ktor
         install(MicrometerMetrics) {
             registry = prometheusRegistry
         }
 
         routing {
-            // Endpoint principal
             get("/") {
                 call.respondText("Hello, World!")
             }
 
-            // Endpoint para expor métricas do Prometheus
             get("/actuator/prometheus") {
                 call.respondText(prometheusRegistry.scrape())
             }

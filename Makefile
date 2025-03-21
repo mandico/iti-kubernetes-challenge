@@ -4,9 +4,10 @@ DOCKER_IMAGE = $(APP_NAME):latest
 DOCKER_CONTAINER = $(APP_NAME)-container
 KIND_CLUSTER=itau-cluster
 PORT = 8080
+#export JAVA_HOME=$(/usr/libexec/java_home -v 17) && export PATH=$JAVA_HOME/bin:$PATH
 
 build:
-	cd $(BASE_DIR) && export JAVA_HOME=$(/usr/libexec/java_home -v 17) && export PATH=$JAVA_HOME/bin:$PATH && ./gradlew clean build -x test
+	cd $(BASE_DIR) && ./gradlew clean build -x test
 
 docker-build:
 	cd $(BASE_DIR) && docker build --no-cache -t $(DOCKER_IMAGE) .
@@ -15,7 +16,7 @@ docker-run: docker-build
 	docker run --rm -p $(PORT):8080 --name $(DOCKER_CONTAINER) $(DOCKER_IMAGE)
 
 docker-scan:
-	docker run aquasec/trivy image $(DOCKER_IMAGE)
+	docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image $(DOCKER_IMAGE)
 
 docker-clean:
 	docker rmi -f $(DOCKER_IMAGE)
@@ -53,6 +54,11 @@ istio-uninstall:
 	istioctl x uninstall --purge -y
 	kubectl delete namespace istio-system
 
+prometheus-install:
+	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+	helm repo update
+	helm install prometheus prometheus-community/prometheus --namespace monitoring --create-namespace -f observability/prometheus-values.yaml
+
 prometheus-uninstall:
 	helm uninstall prometheus --namespace monitoring
 
@@ -60,10 +66,6 @@ prometheus-access:
 	kubectl port-forward -n monitoring service/prometheus-server 9090:80
 	@echo "Access Prometheus at http://localhost:9090"
 
-prometheus-install:
-	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-	helm repo update
-	helm install prometheus prometheus-community/prometheus --namespace monitoring --create-namespace -f observability/prometheus-values.yaml
 grafana-install:
 	helm repo add grafana https://grafana.github.io/helm-charts
 	helm repo update
@@ -75,7 +77,6 @@ grafana-uninstall:
 grafana-access:
 	kubectl port-forward -n monitoring service/grafana 3000:80
 	@echo "Access Grafana at http://localhost:3000 (username: admin, password: admin)"
-
 
 clean:
 	cd $(BASE_DIR) && ./gradlew clean
