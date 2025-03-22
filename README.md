@@ -43,6 +43,57 @@ Abaixo, descrevo os itens levados em consideração para uma melhor execução d
 
 --- 
 
+## **Estrutura**
+```bash
+├── Chart --------------------------------------- Folder Helm Chart
+│   └── app
+│       ├── Chart.yaml
+│       ├── charts
+│       ├── templates
+│       │   ├── NOTES.txt
+│       │   ├── _helpers.tpl
+│       │   ├── deployment.yaml
+│       │   ├── hpa.yaml
+│       │   ├── ingress.yaml
+│       │   ├── service.yaml
+│       │   ├── serviceaccount.yaml
+│       │   └── tests
+│       │       └── test-connection.yaml
+│       └── values.yaml
+├── Makefile ------------------------------------ Makefile
+├── README.md ----------------------------------- README do Projeto
+├── app ----------------------------------------- Folder do Código Fonte
+│   ├── Dockerfile ------------------------------ Dockerfile da Aplicação
+│   ├── build.gradle
+│   └── src
+│       └── main
+│           └── kotlin
+│               └── com
+│                   └── example
+│                       └── hello
+│                           └── Main.kt
+├── img ----------------------------------------- Folder de Imagens do README
+│   ├── grafana.jpg
+│   ├── itau.png
+│   ├── make_build.jpg
+│   ├── make_docker_build.jpg
+│   ├── make_docker_scan.jpg
+│   ├── make_expose_app.jpg
+│   ├── make_get_all.jpg
+│   ├── make_terraform_apply.jpg
+│   └── prometheus.jpg
+├── observability ------------------------------- Folder Configs Observabilidade
+│   ├── grafana-values.yaml
+│   └── prometheus-values.yaml
+└── terraform ----------------------------------- Folder Terraform
+    ├── main.tf
+    ├── terraform.tfstate
+    ├── terraform.tfstate.backup
+    └── variables.tf
+```
+
+--- 
+
 ## **Passos para Execução**
 
 ### **1. Build da Aplicação**
